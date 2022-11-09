@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,12 +25,31 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Read images files
 	imgPath := filepath.Join(curDir, "edit/otter.png")
+	img, err := os.Open(imgPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	imgBytes, err := io.ReadAll(img)
+	if err != nil {
+		log.Fatal(err)
+	}
 	maskPath := filepath.Join(curDir, "edit/mask.png")
+	mask, err := os.Open(maskPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	maskBytes, err := io.ReadAll(mask)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	resp, err := client.Edit(
 		context.Background(),
-		imgPath,
-		maskPath,
+		imgBytes,
+		maskBytes,
 		"A cute baby sea otter wearing a large sombrero",
 		dalle2.WithNumImages(1),
 		dalle2.WithSize(dalle2.SMALL),

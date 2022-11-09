@@ -27,14 +27,14 @@ type imageRequest struct {
 
 type editRequest struct {
 	apiOption
-	Image  string `url:"image,omitempty"`
-	Mask   string `url:"mask,omitempty"`
+	Image  []byte `url:"image,omitempty"`
+	Mask   []byte `url:"mask,omitempty"`
 	Prompt string `url:"prompt,omitempty"`
 }
 
 type variationRequest struct {
 	apiOption
-	Image string `url:"image,omitempty"`
+	Image []byte `url:"image,omitempty"`
 }
 
 type Option func(*apiOption)
@@ -47,6 +47,7 @@ func newDefaultOptions() apiOption {
 		User:   "",
 	}
 }
+
 func WithNumImages(n uint8) Option {
 	return func(o *apiOption) {
 		o.N = n

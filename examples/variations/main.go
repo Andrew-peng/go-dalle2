@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,10 +25,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Read image file
 	imgPath := filepath.Join(curDir, "variations/otter.png")
+	img, err := os.Open(imgPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	imgBytes, err := io.ReadAll(img)
+	if err != nil {
+		log.Fatal(err)
+	}
 	resp, err := client.Variation(
 		context.Background(),
-		imgPath,
+		imgBytes,
 		dalle2.WithNumImages(1),
 		dalle2.WithSize(dalle2.SMALL),
 		dalle2.WithFormat(dalle2.URL),

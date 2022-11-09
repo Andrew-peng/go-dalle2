@@ -21,9 +21,9 @@ func main() {
 
 	resp, err := client.Create(
 		context.Background(),
-		"A cute baby sea otter",
+		"A skyline view of New York during the sunset, watercolor",
 		dalle2.WithNumImages(1),
-		dalle2.WithSize(dalle2.SMALL),
+		dalle2.WithSize(dalle2.LARGE),
 		dalle2.WithFormat(dalle2.URL),
 	)
 	if err != nil {

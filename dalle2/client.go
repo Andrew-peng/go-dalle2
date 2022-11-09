@@ -10,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/google/go-querystring/query"
 )
@@ -34,8 +33,8 @@ var (
 
 type Client interface {
 	Create(context.Context, string, ...Option) (*Response, error)
-	Edit(context.Context, string, string, string, ...Option) (*Response, error)
-	Variation(context.Context, string, ...Option) (*Response, error)
+	Edit(context.Context, []byte, []byte, string, ...Option) (*Response, error)
+	Variation(context.Context, []byte, ...Option) (*Response, error)
 }
 
 type ClientV1 struct {
@@ -148,7 +147,7 @@ func (c *ClientV1) Create(ctx context.Context, prompt string, opts ...Option) (*
 	return c.handleResponse(resp)
 }
 
-func (c *ClientV1) Edit(ctx context.Context, imagePath, maskPath, prompt string, opts ...Option) (*Response, error) {
+func (c *ClientV1) Edit(ctx context.Context, image, mask []byte, prompt string, opts ...Option) (*Response, error) {
 	if ctx == nil {
 		return nil, errNilCtx
 	}
@@ -159,8 +158,8 @@ func (c *ClientV1) Edit(ctx context.Context, imagePath, maskPath, prompt string,
 	}
 	requestParams := &editRequest{
 		apiOption: options,
-		Image:     imagePath,
-		Mask:      maskPath,
+		Image:     image,
+		Mask:      mask,
 		Prompt:    prompt,
 	}
 
@@ -176,7 +175,7 @@ func (c *ClientV1) Edit(ctx context.Context, imagePath, maskPath, prompt string,
 	return c.handleResponse(resp)
 }
 
-func (c *ClientV1) Variation(ctx context.Context, imagePath string, opts ...Option) (*Response, error) {
+func (c *ClientV1) Variation(ctx context.Context, image []byte, opts ...Option) (*Response, error) {
 	if ctx == nil {
 		return nil, errNilCtx
 	}
@@ -187,7 +186,7 @@ func (c *ClientV1) Variation(ctx context.Context, imagePath string, opts ...Opti
 	}
 	requestParams := &variationRequest{
 		apiOption: options,
-		Image:     imagePath,
+		Image:     image,
 	}
 
 	req, err := c.makeRequest(ctx, "variations", multipartForm, requestParams)
@@ -208,9 +207,11 @@ func encodeFormData(writer *multipart.Writer, data interface{}) error {
 	if err != nil {
 		return err
 	}
+	strFields := []string{"n", "response_format", "size", "user", "format", "prompt"}
+	byteFields := []string{"image", "mask"}
 
 	// text fields
-	for _, k := range []string{"n", "response_format", "size", "user", "format", "prompt"} {
+	for _, k := range strFields {
 		if !kv.Has(k) {
 			continue
 		}
@@ -220,22 +221,41 @@ func encodeFormData(writer *multipart.Writer, data interface{}) error {
 	}
 
 	// image fields
-	for _, k := range []string{"image", "mask"} {
+	for _, k := range byteFields {
 		if !kv.Has(k) {
 			continue
 		}
-		fw, err := writer.CreateFormFile(k, kv.Get(k))
+		fw, err := writer.CreateFormFile(k, k)
 		if err != nil {
 			return err
 		}
-		img, err := os.Open(kv.Get(k))
-		if err != nil {
-			return err
+		switch v := data.(type) {
+		case *editRequest:
+			switch k {
+			case "image":
+				if _, err = io.Copy(fw, bytes.NewReader(v.Image)); err != nil {
+					return err
+				}
+			case "mask":
+				if _, err = io.Copy(fw, bytes.NewReader(v.Mask)); err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf("invalid form field for request: %s", k)
+			}
+		case *variationRequest:
+			switch k {
+			case "image":
+				if _, err = io.Copy(fw, bytes.NewReader(v.Image)); err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf("invalid form field for request: %s", k)
+			}
+		default:
+			return errors.New("error casting request")
 		}
-		defer img.Close()
-		if _, err = io.Copy(fw, img); err != nil {
-			return err
-		}
+
 	}
 	return nil
 }
