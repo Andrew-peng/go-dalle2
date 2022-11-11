@@ -144,7 +144,6 @@ func TestEdit(t *testing.T) {
 	cancel()
 	_, err := client.Edit(badCtx, nil, nil, "")
 	assert.EqualError(t, err, "context canceled")
-	assert.EqualError(t, err, "received nil context")
 
 	resp, err := client.Edit(context.Background(), []byte("image"), []byte("mask"), "this is a test prompt")
 	if err != nil {
