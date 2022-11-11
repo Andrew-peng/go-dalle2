@@ -33,4 +33,13 @@ func TestRoundTrip(t *testing.T) {
 	}); err != nil {
 		t.Error(err)
 	}
+
+	testTransport.ApiKey = ""
+	if _, err := testTransport.RoundTrip(&http.Request{
+		Header: map[string][]string{
+			headerAuth: {"test"},
+		},
+	}); err == nil {
+		t.Error("expected error for missing auth token")
+	}
 }

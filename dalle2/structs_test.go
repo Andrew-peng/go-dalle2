@@ -42,3 +42,15 @@ func TestOption(t *testing.T) {
 	assert.EqualValues(t, BASE64, testOption.Format)
 	assert.EqualValues(t, "test_user", testOption.User)
 }
+
+func TestErrorFormat(t *testing.T) {
+	err := &ErrorResponse{
+		ErrorDetails: &ErrorDetails{
+			Type:    "type",
+			Code:    0,
+			Param:   "param",
+			Message: "message",
+		},
+	}
+	assert.EqualValues(t, "type: message", err.Error())
+}
