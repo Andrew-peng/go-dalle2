@@ -118,6 +118,12 @@ func setup() (client *ClientV1, cleanup func()) {
 func TestCreate(t *testing.T) {
 	client, cleanup := setup()
 	defer cleanup()
+
+	badCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := client.Create(badCtx, "")
+	assert.EqualError(t, err, "context canceled")
+
 	resp, err := client.Create(context.Background(), "this is a test prompt")
 	if err != nil {
 		t.Fatal(err)
@@ -133,6 +139,13 @@ func TestCreate(t *testing.T) {
 func TestEdit(t *testing.T) {
 	client, cleanup := setup()
 	defer cleanup()
+
+	badCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := client.Edit(badCtx, nil, nil, "")
+	assert.EqualError(t, err, "context canceled")
+	assert.EqualError(t, err, "received nil context")
+
 	resp, err := client.Edit(context.Background(), []byte("image"), []byte("mask"), "this is a test prompt")
 	if err != nil {
 		t.Fatal(err)
@@ -148,6 +161,12 @@ func TestEdit(t *testing.T) {
 func TestVariation(t *testing.T) {
 	client, cleanup := setup()
 	defer cleanup()
+
+	badCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := client.Variation(badCtx, nil)
+	assert.EqualError(t, err, "context canceled")
+
 	resp, err := client.Variation(context.Background(), []byte("image"))
 	if err != nil {
 		t.Fatal(err)

@@ -27,10 +27,6 @@ const (
 	multipartForm   = "multipart/form-data"
 )
 
-var (
-	errNilCtx = errors.New("received nil context")
-)
-
 type Client interface {
 	Create(context.Context, string, ...Option) (*Response, error)
 	Edit(context.Context, []byte, []byte, string, ...Option) (*Response, error)
@@ -121,8 +117,8 @@ func (c *ClientV1) handleResponse(resp *http.Response) (*Response, error) {
 }
 
 func (c *ClientV1) Create(ctx context.Context, prompt string, opts ...Option) (*Response, error) {
-	if ctx == nil {
-		return nil, errNilCtx
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 
 	options := newDefaultOptions()
@@ -148,8 +144,8 @@ func (c *ClientV1) Create(ctx context.Context, prompt string, opts ...Option) (*
 }
 
 func (c *ClientV1) Edit(ctx context.Context, image, mask []byte, prompt string, opts ...Option) (*Response, error) {
-	if ctx == nil {
-		return nil, errNilCtx
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 
 	options := newDefaultOptions()
@@ -176,8 +172,8 @@ func (c *ClientV1) Edit(ctx context.Context, image, mask []byte, prompt string, 
 }
 
 func (c *ClientV1) Variation(ctx context.Context, image []byte, opts ...Option) (*Response, error) {
-	if ctx == nil {
-		return nil, errNilCtx
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 
 	options := newDefaultOptions()
