@@ -2,8 +2,8 @@
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/Andrew-peng/go-dalle2)
 [![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/Andrew-peng/go-dalle2/dalle2)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Andrew-peng/go-dalle2/Lint?label=lint)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Andrew-peng/go-dalle2/Test?label=test)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Andrew-peng/go-dalle2/lint.yaml?label=lint)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Andrew-peng/go-dalle2/test.yaml?label=test)
 [![codecov](https://codecov.io/gh/Andrew-peng/go-dalle2/branch/master/graph/badge.svg?token=RKA5UFHKS0)](https://codecov.io/gh/Andrew-peng/go-dalle2)
 ![GitHub](https://img.shields.io/github/license/Andrew-peng/go-dalle2?color=blue)
 
